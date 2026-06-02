@@ -14,11 +14,20 @@ export interface InterventionContext {
 }
 
 let overlayWindow: BrowserWindow | null = null
+let lastInterventionTime = 0
+const INTERVENTION_COOLDOWN_MS = 5000
 
 export function executeIntervention(
   context: InterventionContext,
   mainWindow: BrowserWindow
 ) {
+  const now = Date.now()
+  if (now - lastInterventionTime < INTERVENTION_COOLDOWN_MS) {
+    console.log('[Big Brother] Intervention cooldown, skipping')
+    return
+  }
+  lastInterventionTime = now
+
   // Notify renderer about the intervention (for logs/dashboard)
   mainWindow.webContents.send('intervention:triggered', {
     keyword: context.keywordTerm,
@@ -28,23 +37,34 @@ export function executeIntervention(
     timestamp: new Date().toISOString(),
   })
 
+  const hasBrowserTab = Boolean(context.tabId)
+
   switch (context.actionType) {
     case 'close_tab':
-      closeTab(mainWindow, context.tabId)
+      if (hasBrowserTab) {
+        closeTab(context.tabId!)
+      } else {
+        showOverlay(context)
+      }
       break
 
     case 'close_and_media':
-      closeTab(mainWindow, context.tabId)
+      if (hasBrowserTab) closeTab(context.tabId!)
       if (context.actionConfig.mediaPath) {
         shell.openPath(context.actionConfig.mediaPath)
+      }
+      if (!hasBrowserTab && !context.actionConfig.mediaPath) {
+        showOverlay(context)
       }
       break
 
     case 'close_and_redirect':
-      if (context.actionConfig.redirectUrl && context.tabId) {
-        redirectTab(mainWindow, context.tabId, context.actionConfig.redirectUrl)
+      if (hasBrowserTab && context.actionConfig.redirectUrl) {
+        redirectTab(context.tabId!, context.actionConfig.redirectUrl)
       } else if (context.actionConfig.redirectUrl) {
         shell.openExternal(context.actionConfig.redirectUrl)
+      } else {
+        showOverlay(context)
       }
       break
 
@@ -54,13 +74,11 @@ export function executeIntervention(
   }
 }
 
-function closeTab(_mainWindow: BrowserWindow, tabId?: number) {
-  if (tabId) {
-    nativeMessaging.sendToAll({ action: 'close_tab', tabId })
-  }
+function closeTab(tabId: number) {
+  nativeMessaging.sendToAll({ action: 'close_tab', tabId })
 }
 
-function redirectTab(_mainWindow: BrowserWindow, tabId: number, url: string) {
+function redirectTab(tabId: number, url: string) {
   nativeMessaging.sendToAll({ action: 'redirect', tabId, url })
 }
 

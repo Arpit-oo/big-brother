@@ -100,9 +100,12 @@ app.whenReady().then(() => {
 
   // Load keywords into coordinator
   coordinator.refreshKeywords()
+  console.log('[Big Brother] Keywords loaded:', coordinator.getKeywordCount())
+  console.log('[Big Brother] Sample keywords:', coordinator.getSampleTerms())
 
   // Listen for keyword matches -> execute interventions
   coordinator.on('match', ({ result, event }) => {
+    console.log('[Big Brother] MATCH:', result.keyword.term, 'in', event.source, ':', event.text)
     if (!mainWindow) return
 
     const context: InterventionContext = {
@@ -149,20 +152,28 @@ app.whenReady().then(() => {
 
   // Start window title monitor
   startWindowMonitor((title, processName) => {
+    console.log('[Big Brother] Window title:', title, '(' + processName + ')')
     coordinator.check({
       source: 'app_title',
       text: title,
       detail: processName,
     })
   })
+  console.log('[Big Brother] Window monitor started')
 
   // Start keystroke monitor
-  startKeystrokeMonitor((text) => {
-    coordinator.check({
-      source: 'keystroke',
-      text,
+  try {
+    startKeystrokeMonitor((text) => {
+      console.log('[Big Brother] Keystroke flush:', text)
+      coordinator.check({
+        source: 'keystroke',
+        text,
+      })
     })
-  })
+    console.log('[Big Brother] Keystroke monitor started')
+  } catch (err) {
+    console.error('[Big Brother] Keystroke monitor FAILED:', err)
+  }
 
   // Listen for monitoring toggle from tray
   ipcMain.on('monitoring-toggled', (_event, enabled: boolean) => {

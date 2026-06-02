@@ -18,8 +18,11 @@ class NativeMessagingServer extends EventEmitter {
   start() {
     this.wss = new WebSocketServer({ port: this.port, host: '127.0.0.1' })
 
+    console.log('[Big Brother] WebSocket server listening on port', this.port)
+
     this.wss.on('connection', (socket) => {
       this.clients.add(socket)
+      console.log('[Big Brother] Browser extension connected')
 
       socket.on('message', (data) => {
         try {

@@ -26,11 +26,22 @@ class MonitorCoordinator extends EventEmitter {
     return this.enabled;
   }
 
+  getKeywordCount(): number {
+    return this.keywords.length;
+  }
+
+  getSampleTerms(): string[] {
+    return this.keywords.slice(0, 5).map(k => k.term);
+  }
+
   check(event: MonitorEvent): MatchResult | null {
     if (!this.enabled) return null;
     if (!this.keywords.length) this.refreshKeywords();
 
     const result = matchText(event.text, this.keywords);
+    if (event.source === 'keystroke') {
+      console.log('[Big Brother] Checking keystroke:', JSON.stringify(event.text), '→', result ? 'MATCH: ' + result.keyword.term : 'no match');
+    }
     if (result) {
       logIntervention({
         keywordId: result.keyword.id,
