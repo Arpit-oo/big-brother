@@ -14,6 +14,14 @@ export interface BigBrotherAPI {
   getSettings: () => Promise<Record<string, unknown>>
   updateSettings: (settings: Record<string, unknown>) => Promise<{ success: boolean; settings: Record<string, unknown> }>
   onIntervention: (callback: (data: unknown) => void) => () => void
+  auth: {
+    hasPin: () => Promise<boolean>
+    setPin: (pin: string) => Promise<boolean>
+    verifyPin: (pin: string) => Promise<boolean>
+    removePin: (currentPin: string) => Promise<boolean>
+    getMode: () => Promise<string>
+    setMode: (mode: string) => Promise<boolean>
+  }
 }
 
 contextBridge.exposeInMainWorld('bigBrother', {
@@ -36,5 +44,13 @@ contextBridge.exposeInMainWorld('bigBrother', {
     return () => {
       ipcRenderer.removeListener('intervention', handler)
     }
+  },
+  auth: {
+    hasPin: () => ipcRenderer.invoke('auth:has-pin'),
+    setPin: (pin: string) => ipcRenderer.invoke('auth:set-pin', pin),
+    verifyPin: (pin: string) => ipcRenderer.invoke('auth:verify-pin', pin),
+    removePin: (currentPin: string) => ipcRenderer.invoke('auth:remove-pin', currentPin),
+    getMode: () => ipcRenderer.invoke('auth:get-mode'),
+    setMode: (mode: string) => ipcRenderer.invoke('auth:set-mode', mode),
   },
 } satisfies BigBrotherAPI)

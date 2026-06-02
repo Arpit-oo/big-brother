@@ -3,6 +3,7 @@ import { getDb } from './database'
 const DEFAULT_SETTINGS: Record<string, string> = {
   'auth.mode': 'personal',
   'auth.pin_hash': '',
+  'auth.pin_salt': '',
   'monitoring.enabled': 'true',
   'monitoring.browsers': 'true',
   'monitoring.apps': 'true',
