@@ -6,6 +6,8 @@ export interface BigBrotherAPI {
   addKeyword: (keyword: unknown) => Promise<unknown>
   removeKeyword: (id: string) => Promise<boolean>
   updateKeyword: (id: string, updates: unknown) => Promise<boolean>
+  getCategories: () => Promise<unknown[]>
+  importCategory: (categoryId: string) => Promise<unknown[]>
   getLogs: () => Promise<unknown[]>
   getSettings: () => Promise<Record<string, unknown>>
   updateSettings: (settings: Record<string, unknown>) => Promise<{ success: boolean; settings: Record<string, unknown> }>
@@ -18,6 +20,8 @@ contextBridge.exposeInMainWorld('bigBrother', {
   addKeyword: (keyword: unknown) => ipcRenderer.invoke('keywords:add', keyword),
   removeKeyword: (id: string) => ipcRenderer.invoke('keywords:remove', id),
   updateKeyword: (id: string, updates: unknown) => ipcRenderer.invoke('keywords:update', id, updates),
+  getCategories: () => ipcRenderer.invoke('categories:list'),
+  importCategory: (categoryId: string) => ipcRenderer.invoke('categories:import', categoryId),
   getLogs: () => ipcRenderer.invoke('get-logs'),
   getSettings: () => ipcRenderer.invoke('get-settings'),
   updateSettings: (settings: Record<string, unknown>) =>
