@@ -1,15 +1,24 @@
 import { HashRouter, Routes, Route } from 'react-router-dom'
+import { Toaster } from 'sonner'
+import { Sidebar } from '@/components/Sidebar'
+import { Dashboard } from '@/pages/Dashboard'
+import { Keywords } from '@/pages/Keywords'
+import { Logs } from '@/pages/Logs'
+import { Settings } from '@/pages/Settings'
 import Overlay from './pages/Overlay'
 
-// The main app content (dashboard) will be added in Task 6.2
-// For now, just a placeholder
-function Dashboard() {
+function MainLayout() {
   return (
-    <div className="min-h-screen bg-background text-foreground flex items-center justify-center flex-col gap-2">
-      <h1 className="text-4xl font-bold bg-gradient-to-r from-red-500 to-red-700 bg-clip-text text-transparent">
-        Big Brother
-      </h1>
-      <p className="text-muted-foreground">Watching. Always.</p>
+    <div className="flex h-screen w-screen bg-zinc-950 text-zinc-100 dark">
+      <Sidebar />
+      <main className="flex-1 overflow-hidden">
+        <Routes>
+          <Route path="/" element={<Dashboard />} />
+          <Route path="/keywords" element={<Keywords />} />
+          <Route path="/logs" element={<Logs />} />
+          <Route path="/settings" element={<Settings />} />
+        </Routes>
+      </main>
     </div>
   )
 }
@@ -18,9 +27,19 @@ export default function App() {
   return (
     <HashRouter>
       <Routes>
-        <Route path="/" element={<Dashboard />} />
         <Route path="/overlay" element={<Overlay />} />
+        <Route path="/*" element={<MainLayout />} />
       </Routes>
+      <Toaster
+        theme="dark"
+        toastOptions={{
+          style: {
+            background: '#18181b',
+            border: '1px solid #27272a',
+            color: '#e4e4e7',
+          },
+        }}
+      />
     </HashRouter>
   )
 }
