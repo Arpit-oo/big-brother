@@ -1,7 +1,9 @@
 import { app, BrowserWindow, ipcMain } from 'electron'
 import { join } from 'path'
+import { createTray } from './tray'
 
 let mainWindow: BrowserWindow | null = null
+let isQuitting = false
 
 function createWindow() {
   mainWindow = new BrowserWindow({
@@ -30,13 +32,29 @@ function createWindow() {
     mainWindow.webContents.openDevTools()
   }
 
+  // Minimize to tray instead of closing
+  mainWindow.on('close', (event) => {
+    if (!isQuitting) {
+      event.preventDefault()
+      mainWindow?.hide()
+    }
+  })
+
   mainWindow.on('closed', () => {
     mainWindow = null
   })
 }
 
+app.on('before-quit', () => {
+  isQuitting = true
+})
+
 app.whenReady().then(() => {
   createWindow()
+
+  if (mainWindow) {
+    createTray(mainWindow)
+  }
 
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {
@@ -46,9 +64,7 @@ app.whenReady().then(() => {
 })
 
 app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') {
-    app.quit()
-  }
+  // Do not quit when tray is active — window is just hidden
 })
 
 // --- IPC Handlers (stubs for now, will be implemented in later tasks) ---
