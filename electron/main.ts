@@ -4,6 +4,7 @@ import { createTray } from './tray'
 import { getDb, closeDb } from './db/database'
 import { seedDefaults } from './db/migrations'
 import { registerKeywordHandlers } from './ipc/keyword-handlers'
+import { registerLogHandlers } from './ipc/log-handlers'
 
 let mainWindow: BrowserWindow | null = null
 let isQuitting = false
@@ -77,6 +78,7 @@ app.whenReady().then(() => {
 
   // Register IPC handlers
   registerKeywordHandlers()
+  registerLogHandlers()
 
   createWindow()
 
