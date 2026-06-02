@@ -4,6 +4,7 @@ import { createTray } from './tray'
 
 let mainWindow: BrowserWindow | null = null
 let isQuitting = false
+const startHidden = process.argv.includes('--hidden')
 
 function createWindow() {
   mainWindow = new BrowserWindow({
@@ -11,6 +12,7 @@ function createWindow() {
     height: 800,
     minWidth: 800,
     minHeight: 600,
+    show: false,
     title: 'Big Brother',
     backgroundColor: '#0a0a0a',
     webPreferences: {
@@ -18,6 +20,12 @@ function createWindow() {
       contextIsolation: true,
       nodeIntegration: false,
     },
+  })
+
+  mainWindow.once('ready-to-show', () => {
+    if (!startHidden) {
+      mainWindow?.show()
+    }
   })
 
   // In dev, load the Vite dev server URL; in prod, load the built file
@@ -50,6 +58,15 @@ app.on('before-quit', () => {
 })
 
 app.whenReady().then(() => {
+  // Auto-start with Windows (production only)
+  if (app.isPackaged) {
+    app.setLoginItemSettings({
+      openAtLogin: true,
+      path: app.getPath('exe'),
+      args: ['--hidden'],
+    })
+  }
+
   createWindow()
 
   if (mainWindow) {
