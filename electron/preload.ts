@@ -1,9 +1,11 @@
 import { contextBridge, ipcRenderer } from 'electron'
 
 export interface BigBrotherAPI {
-  getKeywords: () => Promise<string[]>
-  addKeyword: (keyword: string) => Promise<{ success: boolean; keyword: string }>
-  removeKeyword: (keyword: string) => Promise<{ success: boolean; keyword: string }>
+  getKeywords: () => Promise<unknown[]>
+  getKeyword: (id: string) => Promise<unknown | null>
+  addKeyword: (keyword: unknown) => Promise<unknown>
+  removeKeyword: (id: string) => Promise<boolean>
+  updateKeyword: (id: string, updates: unknown) => Promise<boolean>
   getLogs: () => Promise<unknown[]>
   getSettings: () => Promise<Record<string, unknown>>
   updateSettings: (settings: Record<string, unknown>) => Promise<{ success: boolean; settings: Record<string, unknown> }>
@@ -11,9 +13,11 @@ export interface BigBrotherAPI {
 }
 
 contextBridge.exposeInMainWorld('bigBrother', {
-  getKeywords: () => ipcRenderer.invoke('get-keywords'),
-  addKeyword: (keyword: string) => ipcRenderer.invoke('add-keyword', keyword),
-  removeKeyword: (keyword: string) => ipcRenderer.invoke('remove-keyword', keyword),
+  getKeywords: () => ipcRenderer.invoke('keywords:list'),
+  getKeyword: (id: string) => ipcRenderer.invoke('keywords:get', id),
+  addKeyword: (keyword: unknown) => ipcRenderer.invoke('keywords:add', keyword),
+  removeKeyword: (id: string) => ipcRenderer.invoke('keywords:remove', id),
+  updateKeyword: (id: string, updates: unknown) => ipcRenderer.invoke('keywords:update', id, updates),
   getLogs: () => ipcRenderer.invoke('get-logs'),
   getSettings: () => ipcRenderer.invoke('get-settings'),
   updateSettings: (settings: Record<string, unknown>) =>

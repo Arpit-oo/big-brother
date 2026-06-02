@@ -1,8 +1,9 @@
-import { app, BrowserWindow, ipcMain } from 'electron'
+import { app, BrowserWindow } from 'electron'
 import { join } from 'path'
 import { createTray } from './tray'
 import { getDb, closeDb } from './db/database'
 import { seedDefaults } from './db/migrations'
+import { registerKeywordHandlers } from './ipc/keyword-handlers'
 
 let mainWindow: BrowserWindow | null = null
 let isQuitting = false
@@ -74,6 +75,9 @@ app.whenReady().then(() => {
   getDb()
   seedDefaults()
 
+  // Register IPC handlers
+  registerKeywordHandlers()
+
   createWindow()
 
   if (mainWindow) {
@@ -91,36 +95,3 @@ app.on('window-all-closed', () => {
   // Do not quit when tray is active — window is just hidden
 })
 
-// --- IPC Handlers (stubs for now, will be implemented in later tasks) ---
-
-// Keywords
-ipcMain.handle('get-keywords', async () => {
-  return []
-})
-
-ipcMain.handle('add-keyword', async (_event, keyword: string) => {
-  return { success: true, keyword }
-})
-
-ipcMain.handle('remove-keyword', async (_event, keyword: string) => {
-  return { success: true, keyword }
-})
-
-// Logs
-ipcMain.handle('get-logs', async () => {
-  return []
-})
-
-// Settings
-ipcMain.handle('get-settings', async () => {
-  return {
-    monitorKeystrokes: true,
-    monitorBrowser: true,
-    monitorApps: true,
-    interventionType: 'alert',
-  }
-})
-
-ipcMain.handle('update-settings', async (_event, settings: Record<string, unknown>) => {
-  return { success: true, settings }
-})
