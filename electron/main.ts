@@ -1,6 +1,8 @@
 import { app, BrowserWindow, ipcMain } from 'electron'
 import { join } from 'path'
 import { createTray } from './tray'
+import { getDb, closeDb } from './db/database'
+import { seedDefaults } from './db/migrations'
 
 let mainWindow: BrowserWindow | null = null
 let isQuitting = false
@@ -55,6 +57,7 @@ function createWindow() {
 
 app.on('before-quit', () => {
   isQuitting = true
+  closeDb()
 })
 
 app.whenReady().then(() => {
@@ -66,6 +69,10 @@ app.whenReady().then(() => {
       args: ['--hidden'],
     })
   }
+
+  // Initialize database and seed defaults
+  getDb()
+  seedDefaults()
 
   createWindow()
 
