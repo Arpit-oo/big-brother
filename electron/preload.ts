@@ -13,6 +13,7 @@ export interface BigBrotherAPI {
   clearLogs: () => Promise<number>
   getSettings: () => Promise<Record<string, unknown>>
   updateSettings: (settings: Record<string, unknown>) => Promise<{ success: boolean; settings: Record<string, unknown> }>
+  getSetting: (key: string) => Promise<string | null>
   onIntervention: (callback: (data: unknown) => void) => () => void
   auth: {
     hasPin: () => Promise<boolean>
@@ -35,9 +36,15 @@ contextBridge.exposeInMainWorld('bigBrother', {
   getLogs: (filter?: unknown) => ipcRenderer.invoke('logs:list', filter),
   getStats: () => ipcRenderer.invoke('logs:stats'),
   clearLogs: () => ipcRenderer.invoke('logs:clear'),
-  getSettings: () => ipcRenderer.invoke('get-settings'),
-  updateSettings: (settings: Record<string, unknown>) =>
-    ipcRenderer.invoke('update-settings', settings),
+  getSettings: () => ipcRenderer.invoke('settings:get'),
+  updateSettings: (settings: Record<string, unknown>) => {
+    const entries = Object.entries(settings)
+    const promises = entries.map(([key, value]) =>
+      ipcRenderer.invoke('settings:update', key, String(value))
+    )
+    return Promise.all(promises).then(() => ({ success: true, settings }))
+  },
+  getSetting: (key: string) => ipcRenderer.invoke('settings:get-one', key),
   onIntervention: (callback: (data: unknown) => void) => {
     const handler = (_event: Electron.IpcRendererEvent, data: unknown) => callback(data)
     ipcRenderer.on('intervention', handler)
