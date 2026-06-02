@@ -1,0 +1,7 @@
+{
+  "name": "com.bigbrother.monitor",
+  "description": "Big Brother native messaging host",
+  "path": "native-host.exe",
+  "type": "stdio",
+  "allowed_origins": []
+}
