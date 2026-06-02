@@ -1,5 +1,6 @@
 import { BrowserWindow, screen, shell } from 'electron'
 import path from 'path'
+import { nativeMessaging } from './native-messaging'
 
 export interface InterventionContext {
   keywordTerm: string
@@ -53,22 +54,14 @@ export function executeIntervention(
   }
 }
 
-function closeTab(mainWindow: BrowserWindow, tabId?: number) {
+function closeTab(_mainWindow: BrowserWindow, tabId?: number) {
   if (tabId) {
-    // Send to native messaging -> extension to close the tab
-    mainWindow.webContents.send('extension:command', {
-      action: 'close_tab',
-      tabId,
-    })
+    nativeMessaging.sendToAll({ action: 'close_tab', tabId })
   }
 }
 
-function redirectTab(mainWindow: BrowserWindow, tabId: number, url: string) {
-  mainWindow.webContents.send('extension:command', {
-    action: 'redirect',
-    tabId,
-    url,
-  })
+function redirectTab(_mainWindow: BrowserWindow, tabId: number, url: string) {
+  nativeMessaging.sendToAll({ action: 'redirect', tabId, url })
 }
 
 function showOverlay(context: InterventionContext) {

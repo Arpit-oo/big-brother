@@ -1,32 +1,53 @@
-let nativePort: chrome.runtime.Port | null = null;
+let ws: WebSocket | null = null;
+let reconnectTimer: ReturnType<typeof setTimeout> | null = null;
+const WS_URL = 'ws://127.0.0.1:58732';
 
-function connectNative() {
+function connect() {
   try {
-    nativePort = chrome.runtime.connectNative('com.bigbrother.monitor');
+    ws = new WebSocket(WS_URL);
 
-    nativePort.onMessage.addListener((message) => {
-      if (message.action === 'close_tab' && message.tabId) {
-        chrome.tabs.remove(message.tabId).catch(() => {});
-      }
-      if (message.action === 'redirect' && message.tabId && message.url) {
-        chrome.tabs.update(message.tabId, { url: message.url }).catch(() => {});
-      }
-    });
+    ws.onopen = () => {
+      console.log('[Big Brother] Connected to desktop app');
+    };
 
-    nativePort.onDisconnect.addListener(() => {
-      nativePort = null;
-      setTimeout(connectNative, 5000);
-    });
+    ws.onmessage = (event) => {
+      try {
+        const message = JSON.parse(event.data);
+        if (message.action === 'close_tab' && message.tabId) {
+          chrome.tabs.remove(message.tabId).catch(() => {});
+        }
+        if (message.action === 'redirect' && message.tabId && message.url) {
+          chrome.tabs.update(message.tabId, { url: message.url }).catch(() => {});
+        }
+      } catch {}
+    };
+
+    ws.onclose = () => {
+      ws = null;
+      scheduleReconnect();
+    };
+
+    ws.onerror = () => {
+      ws?.close();
+    };
   } catch {
-    setTimeout(connectNative, 5000);
+    scheduleReconnect();
   }
 }
 
-connectNative();
+function scheduleReconnect() {
+  if (reconnectTimer) return;
+  reconnectTimer = setTimeout(() => {
+    reconnectTimer = null;
+    connect();
+  }, 3000);
+}
+
+connect();
 
 chrome.webNavigation.onBeforeNavigate.addListener((details) => {
   if (details.frameId !== 0) return;
-  sendToNative({
+  send({
     type: 'navigation',
     url: details.url,
     tabId: details.tabId,
@@ -39,7 +60,7 @@ chrome.webNavigation.onCompleted.addListener((details) => {
     .get(details.tabId)
     .then((tab) => {
       if (tab.title) {
-        sendToNative({
+        send({
           type: 'page_load',
           url: details.url,
           title: tab.title,
@@ -52,7 +73,7 @@ chrome.webNavigation.onCompleted.addListener((details) => {
 
 chrome.runtime.onMessage.addListener((message, sender) => {
   if (message.type === 'search_query') {
-    sendToNative({
+    send({
       type: 'search',
       query: message.query,
       url: sender.tab?.url,
@@ -61,8 +82,8 @@ chrome.runtime.onMessage.addListener((message, sender) => {
   }
 });
 
-function sendToNative(message: unknown) {
-  if (nativePort) {
-    nativePort.postMessage(message);
+function send(message: unknown) {
+  if (ws && ws.readyState === WebSocket.OPEN) {
+    ws.send(JSON.stringify(message));
   }
 }

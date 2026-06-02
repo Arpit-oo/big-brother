@@ -176,22 +176,22 @@ export function Settings() {
           <SettingRow
             label="Browser Monitoring"
             description="Watch browser tabs and URLs"
-            checked={isEnabled('browser_monitoring')}
-            onChange={() => toggleSetting('browser_monitoring')}
+            checked={isEnabled('monitoring.browsers')}
+            onChange={() => toggleSetting('monitoring.browsers')}
           />
           <Separator className="bg-zinc-800/60" />
           <SettingRow
             label="App Monitoring"
             description="Monitor application window titles"
-            checked={isEnabled('app_monitoring')}
-            onChange={() => toggleSetting('app_monitoring')}
+            checked={isEnabled('monitoring.apps')}
+            onChange={() => toggleSetting('monitoring.apps')}
           />
           <Separator className="bg-zinc-800/60" />
           <SettingRow
             label="Keystroke Monitoring"
             description="Detect keywords from keyboard input"
-            checked={isEnabled('keystroke_monitoring')}
-            onChange={() => toggleSetting('keystroke_monitoring')}
+            checked={isEnabled('monitoring.keystrokes')}
+            onChange={() => toggleSetting('monitoring.keystrokes')}
           />
         </CardContent>
       </Card>
@@ -280,15 +280,15 @@ export function Settings() {
           <SettingRow
             label="Auto-start"
             description="Launch when your computer starts"
-            checked={isEnabled('auto_start', false)}
-            onChange={() => toggleSetting('auto_start')}
+            checked={isEnabled('ui.auto_start', false)}
+            onChange={() => toggleSetting('ui.auto_start')}
           />
           <Separator className="bg-zinc-800/60" />
           <SettingRow
             label="Start Hidden"
             description="Start minimized to system tray"
-            checked={isEnabled('start_hidden', false)}
-            onChange={() => toggleSetting('start_hidden')}
+            checked={isEnabled('ui.start_hidden', false)}
+            onChange={() => toggleSetting('ui.start_hidden')}
           />
         </CardContent>
       </Card>
@@ -308,8 +308,8 @@ export function Settings() {
           <SettingRow
             label="Stealth Mode"
             description="Hide from taskbar and alt-tab"
-            checked={isEnabled('stealth_mode', false)}
-            onChange={() => toggleSetting('stealth_mode')}
+            checked={isEnabled('ui.stealth_mode', false)}
+            onChange={() => toggleSetting('ui.stealth_mode')}
           />
         </CardContent>
       </Card>

@@ -33,11 +33,11 @@ interface LogRecord {
 }
 
 interface Stats {
-  blocked_today: number
-  blocked_all_time: number
-  blocked_last_7_days: number
-  top_keyword_today: string | null
-  source_breakdown: { browser: number; app: number; keystroke: number }
+  totalToday: number
+  totalAllTime: number
+  last7Days: number
+  topKeyword: { term: string; count: number } | null
+  bySource: { source: string; count: number }[]
 }
 
 interface BigBrotherAuth {

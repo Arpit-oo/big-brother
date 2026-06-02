@@ -5,8 +5,8 @@ import { Badge } from '@/components/ui/badge'
 import { ShieldAlert, Activity, TrendingUp, Star, Monitor, Globe, Keyboard } from 'lucide-react'
 
 export function Dashboard() {
-  const [stats, setStats] = useState<Stats | null>(null)
-  const [logs, setLogs] = useState<LogRecord[]>([])
+  const [stats, setStats] = useState<any>(null)
+  const [logs, setLogs] = useState<any[]>([])
   const [monitoring, setMonitoring] = useState(true)
   const [loading, setLoading] = useState(true)
 
@@ -27,7 +27,7 @@ export function Dashboard() {
         const [s, l, monEnabled] = await Promise.all([
           api.getStats(),
           api.getLogs(),
-          api.getSetting('monitoring_enabled'),
+          api.getSetting('monitoring.enabled'),
         ])
         setStats(s)
         setLogs((l as LogRecord[]).slice(0, 10))
@@ -43,33 +43,42 @@ export function Dashboard() {
   const toggleMonitoring = async (checked: boolean) => {
     setMonitoring(checked)
     if (api?.updateSettings) {
-      await api.updateSettings('monitoring_enabled', String(checked))
+      await api.updateSettings('monitoring.enabled', String(checked))
     }
   }
 
-  const sourceBreakdown = stats?.source_breakdown || { browser: 0, app: 0, keystroke: 0 }
-  const totalSources = sourceBreakdown.browser + sourceBreakdown.app + sourceBreakdown.keystroke
+  const bySourceArray: { source: string; count: number }[] = stats?.bySource || []
+  const sourceBreakdown = { browser_url: 0, browser_search: 0, browser_title: 0, app_title: 0, keystroke: 0 }
+  for (const s of bySourceArray) {
+    if (s.source in sourceBreakdown) sourceBreakdown[s.source as keyof typeof sourceBreakdown] = s.count
+  }
+  const grouped = {
+    browser: sourceBreakdown.browser_url + sourceBreakdown.browser_search + sourceBreakdown.browser_title,
+    app: sourceBreakdown.app_title,
+    keystroke: sourceBreakdown.keystroke,
+  }
+  const totalSources = grouped.browser + grouped.app + grouped.keystroke
 
   const statCards = [
     {
       title: 'Blocked Today',
-      value: stats?.blocked_today ?? 0,
+      value: stats?.totalToday ?? 0,
       icon: ShieldAlert,
       accent: true,
     },
     {
       title: 'All Time Blocks',
-      value: stats?.blocked_all_time ?? 0,
+      value: stats?.totalAllTime ?? 0,
       icon: Activity,
     },
     {
       title: 'Last 7 Days',
-      value: stats?.blocked_last_7_days ?? 0,
+      value: stats?.last7Days ?? 0,
       icon: TrendingUp,
     },
     {
       title: 'Top Keyword',
-      value: stats?.top_keyword_today ?? '--',
+      value: stats?.topKeyword?.term ?? '--',
       icon: Star,
       isText: true,
     },
@@ -198,7 +207,7 @@ export function Dashboard() {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              {(Object.entries(sourceBreakdown) as [keyof typeof sourceIcons, number][]).map(
+              {(Object.entries(grouped) as [keyof typeof sourceIcons, number][]).map(
                 ([source, count]) => {
                   const Icon = sourceIcons[source]
                   const pct = totalSources > 0 ? (count / totalSources) * 100 : 0

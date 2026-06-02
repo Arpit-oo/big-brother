@@ -7,7 +7,7 @@ export default defineConfig({
   main: {
     build: {
       rollupOptions: {
-        external: ['better-sqlite3', 'uiohook-napi'],
+        external: ['better-sqlite3', 'uiohook-napi', 'ws'],
         input: {
           index: resolve(__dirname, 'electron/main.ts'),
         },

@@ -1,84 +1,64 @@
-import { EventEmitter } from 'events';
-import net from 'net';
+import { EventEmitter } from 'events'
+import { WebSocketServer, WebSocket } from 'ws'
 
 export interface BrowserEvent {
-  type: 'navigation' | 'search' | 'page_load';
-  url?: string;
-  query?: string;
-  title?: string;
-  tabId?: number;
-  browser?: string;
+  type: 'navigation' | 'search' | 'page_load'
+  url?: string
+  query?: string
+  title?: string
+  tabId?: number
+  browser?: string
 }
 
 class NativeMessagingServer extends EventEmitter {
-  private server: net.Server | null = null;
-  private clients: Set<net.Socket> = new Set();
-  private pipeName = '\\\\.\\pipe\\big-brother-native';
+  private wss: WebSocketServer | null = null
+  private clients: Set<WebSocket> = new Set()
+  private port = 58732
 
   start() {
-    this.server = net.createServer((socket) => {
-      this.clients.add(socket);
-      let buffer = Buffer.alloc(0);
+    this.wss = new WebSocketServer({ port: this.port, host: '127.0.0.1' })
 
-      socket.on('data', (data) => {
-        buffer = Buffer.concat([buffer, data]);
+    this.wss.on('connection', (socket) => {
+      this.clients.add(socket)
 
-        while (buffer.length >= 4) {
-          const msgLength = buffer.readUInt32LE(0);
-          if (buffer.length < 4 + msgLength) break;
-
-          const msgStr = buffer.subarray(4, 4 + msgLength).toString('utf8');
-          buffer = buffer.subarray(4 + msgLength);
-
-          try {
-            const message = JSON.parse(msgStr);
-            this.emit('message', message as BrowserEvent, socket);
-          } catch {}
-        }
-      });
+      socket.on('message', (data) => {
+        try {
+          const message = JSON.parse(data.toString())
+          this.emit('message', message as BrowserEvent)
+        } catch {}
+      })
 
       socket.on('close', () => {
-        this.clients.delete(socket);
-      });
+        this.clients.delete(socket)
+      })
 
       socket.on('error', () => {
-        this.clients.delete(socket);
-      });
-    });
+        this.clients.delete(socket)
+      })
+    })
 
-    this.server.listen(this.pipeName);
+    this.wss.on('error', (err) => {
+      console.error('[Big Brother] WebSocket server error:', err.message)
+    })
   }
 
-  sendToAll(message: any) {
-    const msgStr = JSON.stringify(message);
-    const msgBuf = Buffer.from(msgStr, 'utf8');
-    const lenBuf = Buffer.alloc(4);
-    lenBuf.writeUInt32LE(msgBuf.length, 0);
-    const packet = Buffer.concat([lenBuf, msgBuf]);
-
+  sendToAll(message: unknown) {
+    const data = JSON.stringify(message)
     for (const client of this.clients) {
-      try {
-        client.write(packet);
-      } catch {}
+      if (client.readyState === WebSocket.OPEN) {
+        client.send(data)
+      }
     }
-  }
-
-  sendTo(socket: net.Socket, message: any) {
-    const msgStr = JSON.stringify(message);
-    const msgBuf = Buffer.from(msgStr, 'utf8');
-    const lenBuf = Buffer.alloc(4);
-    lenBuf.writeUInt32LE(msgBuf.length, 0);
-    socket.write(Buffer.concat([lenBuf, msgBuf]));
   }
 
   stop() {
     for (const client of this.clients) {
-      client.destroy();
+      client.close()
     }
-    this.clients.clear();
-    this.server?.close();
-    this.server = null;
+    this.clients.clear()
+    this.wss?.close()
+    this.wss = null
   }
 }
 
-export const nativeMessaging = new NativeMessagingServer();
+export const nativeMessaging = new NativeMessagingServer()

@@ -37,19 +37,22 @@ contextBridge.exposeInMainWorld('bigBrother', {
   getStats: () => ipcRenderer.invoke('logs:stats'),
   clearLogs: () => ipcRenderer.invoke('logs:clear'),
   getSettings: () => ipcRenderer.invoke('settings:get'),
-  updateSettings: (settings: Record<string, unknown>) => {
-    const entries = Object.entries(settings)
-    const promises = entries.map(([key, value]) =>
-      ipcRenderer.invoke('settings:update', key, String(value))
+  updateSettings: (keyOrObj: string | Record<string, unknown>, value?: unknown) => {
+    if (typeof keyOrObj === 'string') {
+      return ipcRenderer.invoke('settings:update', keyOrObj, String(value))
+    }
+    const entries = Object.entries(keyOrObj)
+    const promises = entries.map(([k, v]) =>
+      ipcRenderer.invoke('settings:update', k, String(v))
     )
-    return Promise.all(promises).then(() => ({ success: true, settings }))
+    return Promise.all(promises).then(() => ({ success: true, settings: keyOrObj }))
   },
   getSetting: (key: string) => ipcRenderer.invoke('settings:get-one', key),
   onIntervention: (callback: (data: unknown) => void) => {
     const handler = (_event: Electron.IpcRendererEvent, data: unknown) => callback(data)
-    ipcRenderer.on('intervention', handler)
+    ipcRenderer.on('intervention:triggered', handler)
     return () => {
-      ipcRenderer.removeListener('intervention', handler)
+      ipcRenderer.removeListener('intervention:triggered', handler)
     }
   },
   auth: {
