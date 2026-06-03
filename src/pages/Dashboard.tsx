@@ -1,8 +1,6 @@
 import { useState, useEffect } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Switch } from '@/components/ui/switch'
 import { Badge } from '@/components/ui/badge'
-import { ShieldAlert, Activity, TrendingUp, Star, Monitor, Globe, Keyboard } from 'lucide-react'
 
 export function Dashboard() {
   const [stats, setStats] = useState<any>(null)
@@ -59,37 +57,6 @@ export function Dashboard() {
   }
   const totalSources = grouped.browser + grouped.app + grouped.keystroke
 
-  const statCards = [
-    {
-      title: 'Blocked Today',
-      value: stats?.totalToday ?? 0,
-      icon: ShieldAlert,
-      accent: true,
-    },
-    {
-      title: 'All Time Blocks',
-      value: stats?.totalAllTime ?? 0,
-      icon: Activity,
-    },
-    {
-      title: 'Last 7 Days',
-      value: stats?.last7Days ?? 0,
-      icon: TrendingUp,
-    },
-    {
-      title: 'Top Keyword',
-      value: stats?.topKeyword?.term ?? '--',
-      icon: Star,
-      isText: true,
-    },
-  ]
-
-  const sourceIcons = {
-    browser: Globe,
-    app: Monitor,
-    keystroke: Keyboard,
-  }
-
   if (loading) {
     return (
       <div className="flex items-center justify-center h-full">
@@ -99,143 +66,163 @@ export function Dashboard() {
   }
 
   return (
-    <div className="p-8 space-y-8 overflow-y-auto h-full">
+    <div className="p-10 overflow-y-auto h-full">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight text-zinc-100">Dashboard</h1>
-          <p className="text-sm text-zinc-500 mt-1">Overview of monitoring activity</p>
-        </div>
-        <div className="flex items-center gap-3 px-4 py-2.5 rounded-lg bg-zinc-900/50 border border-zinc-800/60">
-          <span className="text-sm text-zinc-400">Monitoring</span>
+        <h1 className="text-xs font-bold uppercase tracking-[0.3em] text-zinc-500">
+          Dashboard
+        </h1>
+        <div className="flex items-center gap-3">
+          <span className="text-xs uppercase tracking-widest text-zinc-600">
+            Monitoring
+          </span>
           <Switch
             checked={monitoring}
             onCheckedChange={toggleMonitoring}
             className="data-[state=checked]:bg-red-600"
           />
+          <span className={`text-xs font-semibold ${monitoring ? 'text-red-500' : 'text-zinc-600'}`}>
+            {monitoring ? 'Active' : 'Off'}
+          </span>
         </div>
       </div>
 
-      {/* Stats Grid */}
-      <div className="grid grid-cols-4 gap-4">
-        {statCards.map((card) => {
-          const Icon = card.icon
-          return (
-            <Card
-              key={card.title}
-              className={`border-zinc-800/60 ${
-                card.accent ? 'bg-red-500/5 border-red-500/20' : 'bg-zinc-900/50'
-              }`}
-            >
-              <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-                <CardTitle className="text-xs font-medium text-zinc-500 uppercase tracking-wider">
-                  {card.title}
-                </CardTitle>
-                <Icon
-                  className={`w-4 h-4 ${card.accent ? 'text-red-500' : 'text-zinc-600'}`}
-                />
-              </CardHeader>
-              <CardContent>
-                <div
-                  className={`text-2xl font-bold ${
-                    card.accent ? 'text-red-400' : 'text-zinc-100'
-                  } ${card.isText ? 'text-lg truncate' : ''}`}
-                >
-                  {card.value}
-                </div>
-              </CardContent>
-            </Card>
-          )
-        })}
+      <div className="border-b border-zinc-800/40 mt-6 mb-10" />
+
+      {/* Stats Row */}
+      <div className="flex items-end gap-0">
+        {/* Blocked Today */}
+        <div className="flex-1">
+          <p className="text-xs font-medium uppercase tracking-widest text-zinc-600 mb-2">
+            Blocked Today
+          </p>
+          <p className="text-5xl font-black text-red-500 tabular-nums leading-none">
+            {stats?.totalToday ?? 0}
+          </p>
+        </div>
+
+        <div className="w-px h-16 bg-zinc-800/40 mx-6 self-center shrink-0" />
+
+        {/* All Time */}
+        <div className="flex-1">
+          <p className="text-xs font-medium uppercase tracking-widest text-zinc-600 mb-2">
+            All Time
+          </p>
+          <p className="text-5xl font-black text-zinc-100 tabular-nums leading-none">
+            {stats?.totalAllTime ?? 0}
+          </p>
+        </div>
+
+        <div className="w-px h-16 bg-zinc-800/40 mx-6 self-center shrink-0" />
+
+        {/* Last 7 Days */}
+        <div className="flex-1">
+          <p className="text-xs font-medium uppercase tracking-widest text-zinc-600 mb-2">
+            Last 7 Days
+          </p>
+          <p className="text-5xl font-black text-zinc-100 tabular-nums leading-none">
+            {stats?.last7Days ?? 0}
+          </p>
+        </div>
+
+        <div className="w-px h-16 bg-zinc-800/40 mx-6 self-center shrink-0" />
+
+        {/* Top Keyword */}
+        <div className="flex-1">
+          <p className="text-xs font-medium uppercase tracking-widest text-zinc-600 mb-2">
+            Top Keyword
+          </p>
+          <p className="text-3xl font-black text-zinc-100 leading-none truncate">
+            {stats?.topKeyword?.term ?? '--'}
+          </p>
+          {stats?.topKeyword?.count != null && (
+            <p className="text-xs text-zinc-600 mt-1.5 tabular-nums">
+              {stats.topKeyword.count} matches
+            </p>
+          )}
+        </div>
       </div>
 
-      <div className="grid grid-cols-3 gap-6">
-        {/* Recent Activity */}
-        <div className="col-span-2">
-          <Card className="border-zinc-800/60 bg-zinc-900/50">
-            <CardHeader>
-              <CardTitle className="text-sm font-semibold text-zinc-300">
-                Recent Activity
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              {logs.length === 0 ? (
-                <p className="text-sm text-zinc-600 py-8 text-center">No recent activity</p>
-              ) : (
-                <div className="space-y-2">
-                  {logs.map((log) => (
+      <div className="border-b border-zinc-800/40 mt-10 mb-10" />
+
+      {/* Recent Activity */}
+      <div>
+        <h2 className="text-xs font-bold uppercase tracking-[0.3em] text-zinc-500 mb-6">
+          Recent Activity
+        </h2>
+
+        {logs.length === 0 ? (
+          <p className="text-sm text-zinc-600 py-12 text-center">
+            No recent activity recorded
+          </p>
+        ) : (
+          <div>
+            {logs.map((log) => (
+              <div
+                key={log.id}
+                className="flex items-center justify-between py-3.5 border-b border-zinc-800/30"
+              >
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="w-1.5 h-1.5 rounded-full bg-red-500 shrink-0" />
+                  <span className="text-sm font-semibold text-zinc-200 shrink-0">
+                    {log.keyword_term}
+                  </span>
+                  <span className="text-sm text-zinc-600 truncate">
+                    {log.matched_text}
+                  </span>
+                </div>
+                <div className="flex items-center gap-3 shrink-0 ml-4">
+                  <Badge variant="secondary" className="bg-zinc-800/80 text-zinc-500 text-[10px] font-medium border-0">
+                    {log.source}
+                  </Badge>
+                  <span className="text-xs text-zinc-700 tabular-nums">
+                    {new Date(log.timestamp).toLocaleTimeString([], {
+                      hour: '2-digit',
+                      minute: '2-digit',
+                    })}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      <div className="border-b border-zinc-800/40 mt-10 mb-10" />
+
+      {/* Source Breakdown */}
+      <div>
+        <h2 className="text-xs font-bold uppercase tracking-[0.3em] text-zinc-500 mb-6">
+          Source Breakdown
+        </h2>
+
+        {totalSources === 0 ? (
+          <p className="text-sm text-zinc-600 py-8 text-center">No data yet</p>
+        ) : (
+          <div className="space-y-5 max-w-xl">
+            {(Object.entries(grouped) as [string, number][]).map(([source, count]) => {
+              const pct = totalSources > 0 ? (count / totalSources) * 100 : 0
+              return (
+                <div key={source}>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm font-semibold text-zinc-300 capitalize">
+                      {source}
+                    </span>
+                    <span className="text-xs text-zinc-600 tabular-nums">
+                      {count}
+                    </span>
+                  </div>
+                  <div className="h-1 bg-zinc-800/60 overflow-hidden">
                     <div
-                      key={log.id}
-                      className="flex items-center justify-between py-2.5 px-3 rounded-md bg-zinc-950/50 border border-zinc-800/40"
-                    >
-                      <div className="flex items-center gap-3 min-w-0">
-                        <div className="w-1.5 h-1.5 rounded-full bg-red-500 shrink-0" />
-                        <div className="min-w-0">
-                          <p className="text-sm font-medium text-zinc-200 truncate">
-                            {log.keyword_term}
-                          </p>
-                          <p className="text-xs text-zinc-600 truncate">
-                            {log.matched_text}
-                          </p>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-2 shrink-0 ml-3">
-                        <Badge variant="secondary" className="bg-zinc-800 text-zinc-400 text-[10px]">
-                          {log.source}
-                        </Badge>
-                        <span className="text-[10px] text-zinc-600 tabular-nums">
-                          {new Date(log.timestamp).toLocaleTimeString([], {
-                            hour: '2-digit',
-                            minute: '2-digit',
-                          })}
-                        </span>
-                      </div>
-                    </div>
-                  ))}
+                      className="h-full bg-red-500/70 transition-all duration-500"
+                      style={{ width: `${pct}%` }}
+                    />
+                  </div>
                 </div>
-              )}
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Source Breakdown */}
-        <div className="col-span-1">
-          <Card className="border-zinc-800/60 bg-zinc-900/50">
-            <CardHeader>
-              <CardTitle className="text-sm font-semibold text-zinc-300">
-                Source Breakdown
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {(Object.entries(grouped) as [keyof typeof sourceIcons, number][]).map(
-                ([source, count]) => {
-                  const Icon = sourceIcons[source]
-                  const pct = totalSources > 0 ? (count / totalSources) * 100 : 0
-                  return (
-                    <div key={source} className="space-y-1.5">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <Icon className="w-3.5 h-3.5 text-zinc-500" />
-                          <span className="text-sm text-zinc-300 capitalize">{source}</span>
-                        </div>
-                        <span className="text-xs text-zinc-500 tabular-nums">{count}</span>
-                      </div>
-                      <div className="h-1.5 bg-zinc-800 rounded-full overflow-hidden">
-                        <div
-                          className="h-full rounded-full bg-red-500/70 transition-all"
-                          style={{ width: `${pct}%` }}
-                        />
-                      </div>
-                    </div>
-                  )
-                }
-              )}
-              {totalSources === 0 && (
-                <p className="text-xs text-zinc-600 text-center py-4">No data yet</p>
-              )}
-            </CardContent>
-          </Card>
-        </div>
+              )
+            })}
+          </div>
+        )}
       </div>
     </div>
   )
