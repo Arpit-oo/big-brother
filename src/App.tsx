@@ -9,9 +9,9 @@ import Overlay from './pages/Overlay'
 
 function MainLayout() {
   return (
-    <div className="flex h-screen w-screen bg-zinc-950 text-zinc-100 dark">
+    <div className="flex h-screen w-screen bg-zinc-950 text-zinc-100">
       <Sidebar />
-      <main className="flex-1 overflow-hidden">
+      <main className="flex-1 overflow-y-auto overflow-x-hidden bg-zinc-900">
         <Routes>
           <Route path="/" element={<Dashboard />} />
           <Route path="/keywords" element={<Keywords />} />
