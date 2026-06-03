@@ -7,7 +7,6 @@ import {
   DialogDescription,
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
 import { FolderOpen, Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
 
@@ -53,36 +52,47 @@ export function ImportCategoryDialog({ open, onOpenChange, onImported }: ImportC
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl w-[85vw] bg-zinc-950 border-zinc-800 p-8">
-        <DialogHeader>
-          <DialogTitle className="text-xl text-zinc-100">Import Category</DialogTitle>
-          <DialogDescription className="text-zinc-500">
-            Import a pre-built set of keywords from a category. All terms will be added to your keyword list.
-          </DialogDescription>
-        </DialogHeader>
+      <DialogContent className="max-w-4xl w-[85vw] bg-zinc-950 border-zinc-800 p-0 rounded-none sm:max-w-4xl">
+        <div className="p-8 pb-0">
+          <DialogHeader className="space-y-3">
+            <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-zinc-600">
+              Import
+            </p>
+            <DialogTitle className="text-2xl font-black text-zinc-100 font-['Plus_Jakarta_Sans']">
+              Import Category
+            </DialogTitle>
+            <DialogDescription className="text-sm text-zinc-500">
+              Import a pre-built set of keywords from a category. All terms will be added to your keyword list.
+            </DialogDescription>
+          </DialogHeader>
+        </div>
 
-        <div className="py-4 space-y-2 max-h-[60vh] overflow-y-auto pr-1">
+        <div className="border-b border-zinc-800/50 mt-4" />
+
+        <div className="max-h-[60vh] overflow-y-auto">
           {loading ? (
-            <div className="flex items-center justify-center py-12">
-              <Loader2 className="w-6 h-6 animate-spin text-zinc-500" />
+            <div className="flex items-center justify-center py-16">
+              <Loader2 className="w-5 h-5 animate-spin text-zinc-600" />
             </div>
           ) : categories.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-12 text-zinc-500">
-              <FolderOpen className="w-10 h-10 mb-3 text-zinc-600" />
+            <div className="flex flex-col items-center justify-center py-16 text-zinc-600">
+              <FolderOpen className="w-8 h-8 mb-3 text-zinc-700" />
               <p className="text-sm">No categories available</p>
             </div>
           ) : (
-            categories.map((cat) => (
+            categories.map((cat, i) => (
               <div
                 key={cat.id}
-                className="flex items-center justify-between p-4 rounded-lg border border-zinc-800/60 bg-zinc-900/50 hover:bg-zinc-900 transition-colors"
+                className={`flex items-center justify-between px-8 py-5 hover:bg-zinc-900/50 transition-colors ${
+                  i < categories.length - 1 ? 'border-b border-zinc-800/30' : ''
+                }`}
               >
-                <div className="flex-1 min-w-0 mr-4">
-                  <div className="flex items-center gap-2.5 mb-1">
-                    <h3 className="text-sm font-semibold text-zinc-200">{cat.name}</h3>
-                    <Badge variant="secondary" className="bg-zinc-800 text-zinc-400 text-[10px]">
+                <div className="flex-1 min-w-0 mr-6">
+                  <div className="flex items-baseline gap-3 mb-1">
+                    <h3 className="text-sm font-bold text-zinc-200">{cat.name}</h3>
+                    <span className="text-[10px] uppercase tracking-widest text-zinc-600 font-medium">
                       {cat.terms.length} terms
-                    </Badge>
+                    </span>
                   </div>
                   <p className="text-xs text-zinc-500 line-clamp-1">{cat.description}</p>
                 </div>
@@ -90,10 +100,10 @@ export function ImportCategoryDialog({ open, onOpenChange, onImported }: ImportC
                   size="sm"
                   onClick={() => handleImport(cat.id)}
                   disabled={importing === cat.id}
-                  className="bg-red-600 text-white hover:bg-red-700 shrink-0"
+                  className="bg-red-600 text-white hover:bg-red-700 rounded-none text-[10px] uppercase tracking-wider font-semibold h-8 px-4 shrink-0"
                 >
                   {importing === cat.id ? (
-                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    <Loader2 className="w-3 h-3 animate-spin" />
                   ) : (
                     'Import'
                   )}

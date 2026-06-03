@@ -8,8 +8,6 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import {
   Select,
   SelectContent,
@@ -82,52 +80,65 @@ export function AddKeywordDialog({ open, onOpenChange, onAdded, editKeyword }: A
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl w-[85vw] bg-zinc-950 border-zinc-800 p-8">
-        <DialogHeader>
-          <DialogTitle className="text-xl text-zinc-100">
-            {isEditing ? 'Edit Keyword' : 'Add Keyword'}
-          </DialogTitle>
-          <DialogDescription className="text-zinc-500">
-            {isEditing
-              ? 'Modify keyword matching rules and actions.'
-              : 'Configure a new keyword to monitor. Set matching rules and actions.'}
-          </DialogDescription>
-        </DialogHeader>
+      <DialogContent className="max-w-4xl w-[85vw] bg-zinc-950 border-zinc-800 p-0 rounded-none sm:max-w-4xl">
+        <div className="p-8 pb-0">
+          <DialogHeader className="space-y-3">
+            <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-zinc-600">
+              {isEditing ? 'Edit' : 'New'} Keyword
+            </p>
+            <DialogTitle className="text-2xl font-black text-zinc-100 font-['Plus_Jakarta_Sans']">
+              {isEditing ? 'Edit Keyword' : 'Add Keyword'}
+            </DialogTitle>
+            <DialogDescription className="text-sm text-zinc-500">
+              {isEditing
+                ? 'Modify keyword matching rules and actions.'
+                : 'Configure a new keyword to monitor. Set matching rules and actions.'}
+            </DialogDescription>
+          </DialogHeader>
+        </div>
 
-        <div className="grid grid-cols-2 gap-6 py-4">
+        <div className="border-b border-zinc-800/50 mt-4" />
+
+        <div className="grid grid-cols-2 gap-x-8 gap-y-6 p-8">
           {/* Term */}
           <div className="space-y-2">
-            <Label className="text-zinc-300">Keyword Term</Label>
-            <Input
+            <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-500">
+              Keyword Term
+            </label>
+            <input
               value={form.term}
               onChange={(e) => setForm((f) => ({ ...f, term: e.target.value }))}
               placeholder="e.g. explicit-content"
-              className="bg-zinc-900 border-zinc-800 text-zinc-100 placeholder:text-zinc-600"
+              className="w-full bg-transparent border-b border-zinc-700 pb-2 text-sm text-zinc-100 placeholder:text-zinc-700 focus:outline-none focus:border-red-500 transition-colors"
             />
           </div>
 
           {/* Category */}
           <div className="space-y-2">
-            <Label className="text-zinc-300">Category</Label>
-            <Input
+            <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-500">
+              Category
+            </label>
+            <input
               value={form.category}
               onChange={(e) => setForm((f) => ({ ...f, category: e.target.value }))}
               placeholder="e.g. adult, violence, gambling"
-              className="bg-zinc-900 border-zinc-800 text-zinc-100 placeholder:text-zinc-600"
+              className="w-full bg-transparent border-b border-zinc-700 pb-2 text-sm text-zinc-100 placeholder:text-zinc-700 focus:outline-none focus:border-red-500 transition-colors"
             />
           </div>
 
           {/* Match Mode */}
           <div className="space-y-2">
-            <Label className="text-zinc-300">Match Mode</Label>
+            <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-500">
+              Match Mode
+            </label>
             <Select
               value={form.match_mode}
               onValueChange={(v) => setForm((f) => ({ ...f, match_mode: v as any }))}
             >
-              <SelectTrigger className="bg-zinc-900 border-zinc-800 text-zinc-100">
+              <SelectTrigger className="bg-transparent border-0 border-b border-zinc-700 rounded-none text-zinc-100 text-sm h-auto pb-2 px-0 focus:ring-0 focus:border-red-500">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent className="bg-zinc-900 border-zinc-800">
+              <SelectContent className="bg-zinc-900 border-zinc-800 rounded-none">
                 <SelectItem value="exact">Exact</SelectItem>
                 <SelectItem value="contains">Contains</SelectItem>
                 <SelectItem value="smart">Smart</SelectItem>
@@ -138,15 +149,17 @@ export function AddKeywordDialog({ open, onOpenChange, onAdded, editKeyword }: A
 
           {/* Action Type */}
           <div className="space-y-2">
-            <Label className="text-zinc-300">Action Type</Label>
+            <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-500">
+              Action Type
+            </label>
             <Select
               value={form.action_type}
               onValueChange={(v) => setForm((f) => ({ ...f, action_type: v as any }))}
             >
-              <SelectTrigger className="bg-zinc-900 border-zinc-800 text-zinc-100">
+              <SelectTrigger className="bg-transparent border-0 border-b border-zinc-700 rounded-none text-zinc-100 text-sm h-auto pb-2 px-0 focus:ring-0 focus:border-red-500">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent className="bg-zinc-900 border-zinc-800">
+              <SelectContent className="bg-zinc-900 border-zinc-800 rounded-none">
                 <SelectItem value="close_tab">Close Tab</SelectItem>
                 <SelectItem value="close_and_media">Close & Play Media</SelectItem>
                 <SelectItem value="close_and_redirect">Close & Redirect</SelectItem>
@@ -158,12 +171,14 @@ export function AddKeywordDialog({ open, onOpenChange, onAdded, editKeyword }: A
           {/* Conditional: Media Path */}
           {form.action_type === 'close_and_media' && (
             <div className="space-y-2 col-span-2">
-              <Label className="text-zinc-300">Media File Path</Label>
-              <Input
+              <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-500">
+                Media File Path
+              </label>
+              <input
                 value={form.action_config.mediaPath || ''}
                 onChange={(e) => updateConfig('mediaPath', e.target.value)}
-                placeholder="C:\\path\\to\\media.mp4"
-                className="bg-zinc-900 border-zinc-800 text-zinc-100 placeholder:text-zinc-600"
+                placeholder="C:\path\to\media.mp4"
+                className="w-full bg-transparent border-b border-zinc-700 pb-2 text-sm text-zinc-100 placeholder:text-zinc-700 focus:outline-none focus:border-red-500 transition-colors"
               />
             </div>
           )}
@@ -171,12 +186,14 @@ export function AddKeywordDialog({ open, onOpenChange, onAdded, editKeyword }: A
           {/* Conditional: Redirect URL */}
           {form.action_type === 'close_and_redirect' && (
             <div className="space-y-2 col-span-2">
-              <Label className="text-zinc-300">Redirect URL</Label>
-              <Input
+              <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-500">
+                Redirect URL
+              </label>
+              <input
                 value={form.action_config.redirectUrl || ''}
                 onChange={(e) => updateConfig('redirectUrl', e.target.value)}
                 placeholder="https://example.com"
-                className="bg-zinc-900 border-zinc-800 text-zinc-100 placeholder:text-zinc-600"
+                className="w-full bg-transparent border-b border-zinc-700 pb-2 text-sm text-zinc-100 placeholder:text-zinc-700 focus:outline-none focus:border-red-500 transition-colors"
               />
             </div>
           )}
@@ -184,28 +201,32 @@ export function AddKeywordDialog({ open, onOpenChange, onAdded, editKeyword }: A
           {/* Conditional: Overlay Message */}
           {form.action_type === 'overlay' && (
             <div className="space-y-2 col-span-2">
-              <Label className="text-zinc-300">Overlay Message</Label>
+              <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-500">
+                Overlay Message
+              </label>
               <textarea
                 value={form.action_config.overlayMessage || ''}
                 onChange={(e) => updateConfig('overlayMessage', e.target.value)}
                 placeholder="This content has been blocked."
                 rows={3}
-                className="flex w-full rounded-md border border-zinc-800 bg-zinc-900 px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ring-offset-background"
+                className="w-full bg-transparent border-b border-zinc-700 pb-2 text-sm text-zinc-100 placeholder:text-zinc-700 focus:outline-none focus:border-red-500 transition-colors resize-none"
               />
             </div>
           )}
 
           {/* Bypass Mode */}
           <div className="space-y-2">
-            <Label className="text-zinc-300">Bypass Mode</Label>
+            <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-500">
+              Bypass Mode
+            </label>
             <Select
               value={form.bypass_mode}
               onValueChange={(v) => setForm((f) => ({ ...f, bypass_mode: v as any }))}
             >
-              <SelectTrigger className="bg-zinc-900 border-zinc-800 text-zinc-100">
+              <SelectTrigger className="bg-transparent border-0 border-b border-zinc-700 rounded-none text-zinc-100 text-sm h-auto pb-2 px-0 focus:ring-0 focus:border-red-500">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent className="bg-zinc-900 border-zinc-800">
+              <SelectContent className="bg-zinc-900 border-zinc-800 rounded-none">
                 <SelectItem value="none">None</SelectItem>
                 <SelectItem value="soft">Soft</SelectItem>
                 <SelectItem value="cooldown">Cooldown</SelectItem>
@@ -217,31 +238,35 @@ export function AddKeywordDialog({ open, onOpenChange, onAdded, editKeyword }: A
           {/* Cooldown Seconds (visible when bypass=cooldown) */}
           {form.bypass_mode === 'cooldown' && (
             <div className="space-y-2">
-              <Label className="text-zinc-300">Cooldown (seconds)</Label>
-              <Input
+              <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-500">
+                Cooldown (seconds)
+              </label>
+              <input
                 type="number"
                 value={form.bypass_cooldown_seconds}
                 onChange={(e) =>
                   setForm((f) => ({ ...f, bypass_cooldown_seconds: parseInt(e.target.value) || 0 }))
                 }
-                className="bg-zinc-900 border-zinc-800 text-zinc-100"
+                className="w-full bg-transparent border-b border-zinc-700 pb-2 text-sm text-zinc-100 focus:outline-none focus:border-red-500 transition-colors"
               />
             </div>
           )}
         </div>
 
-        <DialogFooter className="gap-2">
+        <div className="border-t border-zinc-800/50" />
+
+        <DialogFooter className="p-8 pt-6 gap-3">
           <Button
             variant="outline"
             onClick={() => onOpenChange(false)}
-            className="border-zinc-800 text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800"
+            className="border-zinc-700 text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800 rounded-none text-xs uppercase tracking-wider font-semibold h-10 px-6"
           >
             Cancel
           </Button>
           <Button
             onClick={handleSave}
             disabled={saving}
-            className="bg-red-600 text-white hover:bg-red-700"
+            className="bg-red-600 text-white hover:bg-red-700 rounded-none text-xs uppercase tracking-wider font-semibold h-10 px-6"
           >
             {saving ? 'Saving...' : isEditing ? 'Update Keyword' : 'Add Keyword'}
           </Button>
