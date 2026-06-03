@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Switch } from '@/components/ui/switch'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -19,15 +18,7 @@ import {
   DialogDescription,
   DialogFooter,
 } from '@/components/ui/dialog'
-import { Separator } from '@/components/ui/separator'
-import {
-  Monitor,
-  Shield,
-  Rocket,
-  Palette,
-  Database,
-  Loader2,
-} from 'lucide-react'
+import { Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
 
 export function Settings() {
@@ -148,73 +139,67 @@ export function Settings() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-full">
-        <Loader2 className="w-6 h-6 animate-spin text-zinc-500" />
+        <Loader2 className="w-5 h-5 animate-spin text-zinc-600" />
       </div>
     )
   }
 
   return (
-    <div className="p-8 space-y-6 overflow-y-auto h-full max-w-4xl">
+    <div className="p-10 space-y-12 overflow-y-auto h-full max-w-3xl">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold tracking-tight text-zinc-100">Settings</h1>
-        <p className="text-sm text-zinc-500 mt-1">Configure Big Brother behavior</p>
+        <h1 className="text-xs font-bold uppercase tracking-[0.3em] text-zinc-500">
+          Settings
+        </h1>
+        <div className="border-b border-zinc-800/50 mt-4" />
       </div>
 
-      {/* Monitoring */}
-      <Card className="border-zinc-800/60 bg-zinc-900/50">
-        <CardHeader className="flex flex-row items-center gap-3 space-y-0">
-          <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-emerald-500/10">
-            <Monitor className="w-4 h-4 text-emerald-500" />
-          </div>
-          <div>
-            <CardTitle className="text-base text-zinc-200">Monitoring</CardTitle>
-            <CardDescription className="text-zinc-500">Choose what to monitor</CardDescription>
-          </div>
-        </CardHeader>
-        <CardContent className="space-y-4">
+      {/* MONITORING */}
+      <section className="space-y-0">
+        <div className="pb-3 border-b border-zinc-800/40">
+          <h2 className="text-sm font-bold uppercase tracking-wider text-zinc-400">
+            Monitoring
+          </h2>
+        </div>
+        <div className="pt-2">
           <SettingRow
             label="Browser Monitoring"
             description="Watch browser tabs and URLs"
             checked={isEnabled('monitoring.browsers')}
             onChange={() => toggleSetting('monitoring.browsers')}
           />
-          <Separator className="bg-zinc-800/60" />
           <SettingRow
             label="App Monitoring"
             description="Monitor application window titles"
             checked={isEnabled('monitoring.apps')}
             onChange={() => toggleSetting('monitoring.apps')}
           />
-          <Separator className="bg-zinc-800/60" />
           <SettingRow
             label="Keystroke Monitoring"
             description="Detect keywords from keyboard input"
             checked={isEnabled('monitoring.keystrokes')}
             onChange={() => toggleSetting('monitoring.keystrokes')}
+            last
           />
-        </CardContent>
-      </Card>
+        </div>
+      </section>
 
-      {/* Security */}
-      <Card className="border-zinc-800/60 bg-zinc-900/50">
-        <CardHeader className="flex flex-row items-center gap-3 space-y-0">
-          <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-red-500/10">
-            <Shield className="w-4 h-4 text-red-500" />
-          </div>
-          <div>
-            <CardTitle className="text-base text-zinc-200">Security</CardTitle>
-            <CardDescription className="text-zinc-500">Authentication and access control</CardDescription>
-          </div>
-        </CardHeader>
-        <CardContent className="space-y-5">
-          <div className="flex items-center justify-between">
+      {/* SECURITY */}
+      <section className="space-y-0">
+        <div className="pb-3 border-b border-zinc-800/40">
+          <h2 className="text-sm font-bold uppercase tracking-wider text-zinc-400">
+            Security
+          </h2>
+        </div>
+        <div className="pt-2">
+          {/* Auth Mode */}
+          <div className="flex items-center justify-between py-4 border-b border-zinc-800/30">
             <div>
-              <Label className="text-sm text-zinc-300">Auth Mode</Label>
+              <p className="text-sm text-zinc-300">Auth Mode</p>
               <p className="text-xs text-zinc-600 mt-0.5">Personal for self-use, managed for parental control</p>
             </div>
             <Select value={authMode} onValueChange={(v) => handleChangeAuthMode(v as any)}>
-              <SelectTrigger className="w-40 bg-zinc-900 border-zinc-800 text-zinc-300 h-9 text-sm">
+              <SelectTrigger className="w-36 bg-transparent border-zinc-800 text-zinc-300 h-9 text-sm focus:ring-0">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent className="bg-zinc-900 border-zinc-800">
@@ -223,208 +208,184 @@ export function Settings() {
               </SelectContent>
             </Select>
           </div>
-          <Separator className="bg-zinc-800/60" />
-          <div className="flex items-center justify-between">
+          {/* PIN Protection */}
+          <div className="flex items-center justify-between py-4">
             <div>
-              <Label className="text-sm text-zinc-300">PIN Protection</Label>
+              <p className="text-sm text-zinc-300">PIN Protection</p>
               <p className="text-xs text-zinc-600 mt-0.5">
                 {hasPin ? 'PIN is set' : 'No PIN configured'}
               </p>
             </div>
-            <div className="flex gap-2">
+            <div className="flex gap-3">
               {hasPin ? (
                 <>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="border-zinc-800 text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800 text-xs"
+                  <button
+                    className="text-xs uppercase tracking-wider text-zinc-500 hover:text-zinc-300 transition-colors"
                     onClick={() => setPinAction('change')}
                   >
-                    Change PIN
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="border-zinc-800 text-red-400 hover:text-red-300 hover:bg-red-500/10 text-xs"
+                    Change
+                  </button>
+                  <button
+                    className="text-xs uppercase tracking-wider text-red-500 hover:text-red-400 transition-colors"
                     onClick={() => setPinAction('remove')}
                   >
                     Remove
-                  </Button>
+                  </button>
                 </>
               ) : (
-                <Button
-                  size="sm"
-                  className="bg-red-600 text-white hover:bg-red-700 text-xs"
+                <button
+                  className="text-xs uppercase tracking-wider text-red-500 hover:text-red-400 transition-colors"
                   onClick={() => setPinAction('set')}
                 >
                   Set PIN
-                </Button>
+                </button>
               )}
             </div>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </section>
 
-      {/* Startup */}
-      <Card className="border-zinc-800/60 bg-zinc-900/50">
-        <CardHeader className="flex flex-row items-center gap-3 space-y-0">
-          <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-blue-500/10">
-            <Rocket className="w-4 h-4 text-blue-500" />
-          </div>
-          <div>
-            <CardTitle className="text-base text-zinc-200">Startup</CardTitle>
-            <CardDescription className="text-zinc-500">Launch behavior</CardDescription>
-          </div>
-        </CardHeader>
-        <CardContent className="space-y-4">
+      {/* STARTUP */}
+      <section className="space-y-0">
+        <div className="pb-3 border-b border-zinc-800/40">
+          <h2 className="text-sm font-bold uppercase tracking-wider text-zinc-400">
+            Startup
+          </h2>
+        </div>
+        <div className="pt-2">
           <SettingRow
             label="Auto-start"
             description="Launch when your computer starts"
             checked={isEnabled('ui.auto_start', false)}
             onChange={() => toggleSetting('ui.auto_start')}
           />
-          <Separator className="bg-zinc-800/60" />
           <SettingRow
             label="Start Hidden"
             description="Start minimized to system tray"
             checked={isEnabled('ui.start_hidden', false)}
             onChange={() => toggleSetting('ui.start_hidden')}
           />
-        </CardContent>
-      </Card>
-
-      {/* Appearance */}
-      <Card className="border-zinc-800/60 bg-zinc-900/50">
-        <CardHeader className="flex flex-row items-center gap-3 space-y-0">
-          <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-purple-500/10">
-            <Palette className="w-4 h-4 text-purple-500" />
-          </div>
-          <div>
-            <CardTitle className="text-base text-zinc-200">Appearance</CardTitle>
-            <CardDescription className="text-zinc-500">Visual preferences</CardDescription>
-          </div>
-        </CardHeader>
-        <CardContent>
           <SettingRow
             label="Stealth Mode"
             description="Hide from taskbar and alt-tab"
             checked={isEnabled('ui.stealth_mode', false)}
             onChange={() => toggleSetting('ui.stealth_mode')}
+            last
           />
-        </CardContent>
-      </Card>
+        </div>
+      </section>
 
-      {/* Data */}
-      <Card className="border-zinc-800/60 bg-zinc-900/50">
-        <CardHeader className="flex flex-row items-center gap-3 space-y-0">
-          <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-amber-500/10">
-            <Database className="w-4 h-4 text-amber-500" />
-          </div>
-          <div>
-            <CardTitle className="text-base text-zinc-200">Data</CardTitle>
-            <CardDescription className="text-zinc-500">Export and manage data</CardDescription>
-          </div>
-        </CardHeader>
-        <CardContent className="flex gap-3">
-          <Button
-            variant="outline"
-            className="border-zinc-800 text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800"
+      {/* DATA */}
+      <section className="space-y-0">
+        <div className="pb-3 border-b border-zinc-800/40">
+          <h2 className="text-sm font-bold uppercase tracking-wider text-zinc-400">
+            Data
+          </h2>
+        </div>
+        <div className="flex items-center gap-6 pt-6">
+          <button
+            className="text-xs uppercase tracking-wider text-zinc-500 hover:text-zinc-300 transition-colors"
           >
             Export Logs
-          </Button>
-          <Button
-            variant="outline"
+          </button>
+          <button
             onClick={() => setConfirmClearData(true)}
-            className="border-zinc-800 text-red-400 hover:text-red-300 hover:bg-red-500/10 hover:border-red-500/20"
+            className="text-xs uppercase tracking-wider text-red-500 hover:text-red-400 transition-colors"
           >
             Clear All Data
-          </Button>
-        </CardContent>
-      </Card>
+          </button>
+        </div>
+      </section>
 
       {/* PIN Dialog */}
       <Dialog open={pinAction !== null} onOpenChange={(v) => !v && setPinAction(null)}>
-        <DialogContent className="max-w-md bg-zinc-950 border-zinc-800 p-6">
+        <DialogContent className="max-w-md bg-zinc-950 border-zinc-800 p-8">
           <DialogHeader>
-            <DialogTitle className="text-zinc-100">
+            <DialogTitle className="text-xs font-bold uppercase tracking-[0.3em] text-zinc-400">
               {pinAction === 'set' ? 'Set PIN' : pinAction === 'change' ? 'Change PIN' : 'Remove PIN'}
             </DialogTitle>
-            <DialogDescription className="text-zinc-500">
+            <DialogDescription className="text-zinc-500 text-sm mt-3">
               {pinAction === 'remove'
                 ? 'Enter your current PIN to remove it.'
                 : 'Enter a PIN (at least 4 characters) to protect settings.'}
             </DialogDescription>
           </DialogHeader>
-          <div className="space-y-3 py-2">
+          <div className="space-y-4 py-4">
             {(pinAction === 'change' || pinAction === 'remove') && (
-              <div className="space-y-1.5">
-                <Label className="text-zinc-400 text-xs">Current PIN</Label>
+              <div className="space-y-2">
+                <Label className="text-xs uppercase tracking-wider text-zinc-500">Current PIN</Label>
                 <Input
                   type="password"
                   value={currentPinInput}
                   onChange={(e) => setCurrentPinInput(e.target.value)}
-                  className="bg-zinc-900 border-zinc-800 text-zinc-100"
+                  className="bg-transparent border-0 border-b border-zinc-800 rounded-none text-zinc-100 focus-visible:ring-0 focus-visible:border-zinc-600 px-0"
                 />
               </div>
             )}
             {pinAction !== 'remove' && (
               <>
-                <div className="space-y-1.5">
-                  <Label className="text-zinc-400 text-xs">New PIN</Label>
+                <div className="space-y-2">
+                  <Label className="text-xs uppercase tracking-wider text-zinc-500">New PIN</Label>
                   <Input
                     type="password"
                     value={pinInput}
                     onChange={(e) => setPinInput(e.target.value)}
-                    className="bg-zinc-900 border-zinc-800 text-zinc-100"
+                    className="bg-transparent border-0 border-b border-zinc-800 rounded-none text-zinc-100 focus-visible:ring-0 focus-visible:border-zinc-600 px-0"
                   />
                 </div>
-                <div className="space-y-1.5">
-                  <Label className="text-zinc-400 text-xs">Confirm PIN</Label>
+                <div className="space-y-2">
+                  <Label className="text-xs uppercase tracking-wider text-zinc-500">Confirm PIN</Label>
                   <Input
                     type="password"
                     value={confirmPinInput}
                     onChange={(e) => setConfirmPinInput(e.target.value)}
-                    className="bg-zinc-900 border-zinc-800 text-zinc-100"
+                    className="bg-transparent border-0 border-b border-zinc-800 rounded-none text-zinc-100 focus-visible:ring-0 focus-visible:border-zinc-600 px-0"
                   />
                 </div>
               </>
             )}
           </div>
-          <DialogFooter className="gap-2">
-            <Button
-              variant="outline"
+          <DialogFooter className="gap-3 mt-4">
+            <button
               onClick={() => setPinAction(null)}
-              className="border-zinc-800 text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800"
+              className="text-xs uppercase tracking-wider text-zinc-500 hover:text-zinc-300 transition-colors"
             >
               Cancel
-            </Button>
-            <Button onClick={handleSetPin} className="bg-red-600 text-white hover:bg-red-700">
+            </button>
+            <button
+              onClick={handleSetPin}
+              className="text-xs uppercase tracking-wider text-red-500 hover:text-red-400 transition-colors"
+            >
               {pinAction === 'remove' ? 'Remove PIN' : 'Save PIN'}
-            </Button>
+            </button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
       {/* Clear Data Dialog */}
       <Dialog open={confirmClearData} onOpenChange={setConfirmClearData}>
-        <DialogContent className="max-w-md bg-zinc-950 border-zinc-800 p-6">
+        <DialogContent className="max-w-md bg-zinc-950 border-zinc-800 p-8">
           <DialogHeader>
-            <DialogTitle className="text-zinc-100">Clear All Data</DialogTitle>
-            <DialogDescription className="text-zinc-500">
+            <DialogTitle className="text-xs font-bold uppercase tracking-[0.3em] text-zinc-400">
+              Clear All Data
+            </DialogTitle>
+            <DialogDescription className="text-zinc-500 text-sm mt-3">
               This will permanently delete all logs and activity data. This cannot be undone.
             </DialogDescription>
           </DialogHeader>
-          <DialogFooter className="gap-2">
-            <Button
-              variant="outline"
+          <DialogFooter className="gap-3 mt-6">
+            <button
               onClick={() => setConfirmClearData(false)}
-              className="border-zinc-800 text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800"
+              className="text-xs uppercase tracking-wider text-zinc-500 hover:text-zinc-300 transition-colors"
             >
               Cancel
-            </Button>
-            <Button onClick={handleClearData} className="bg-red-600 text-white hover:bg-red-700">
+            </button>
+            <button
+              onClick={handleClearData}
+              className="text-xs uppercase tracking-wider text-red-500 hover:text-red-400 transition-colors"
+            >
               Clear All
-            </Button>
+            </button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -437,16 +398,18 @@ function SettingRow({
   description,
   checked,
   onChange,
+  last = false,
 }: {
   label: string
   description: string
   checked: boolean
   onChange: () => void
+  last?: boolean
 }) {
   return (
-    <div className="flex items-center justify-between">
+    <div className={`flex items-center justify-between py-4 ${last ? '' : 'border-b border-zinc-800/30'}`}>
       <div>
-        <Label className="text-sm text-zinc-300">{label}</Label>
+        <p className="text-sm text-zinc-300">{label}</p>
         <p className="text-xs text-zinc-600 mt-0.5">{description}</p>
       </div>
       <Switch

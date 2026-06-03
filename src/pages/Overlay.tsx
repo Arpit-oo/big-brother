@@ -35,7 +35,6 @@ export default function Overlay() {
         e.preventDefault()
         return
       }
-      // Block Alt+F4, Ctrl+W, etc in overlay
       if (e.key === 'F4' && e.altKey) e.preventDefault()
       if (e.key === 'w' && e.ctrlKey) e.preventDefault()
       if (e.key === 'Escape') e.preventDefault()
@@ -70,42 +69,39 @@ export default function Overlay() {
   }
 
   return (
-    <div className="fixed inset-0 bg-black flex items-center justify-center select-none" style={{ cursor: 'default' }}>
-      <div className="text-center max-w-2xl mx-auto p-12 animate-in fade-in duration-500">
-        {/* Eye icon */}
-        <div className="relative mb-10">
-          <div className="w-32 h-32 mx-auto rounded-full border-4 border-red-500/30 flex items-center justify-center">
-            <div className="w-24 h-24 rounded-full border-4 border-red-500/60 flex items-center justify-center">
-              <div className="w-8 h-8 rounded-full bg-red-500 animate-pulse" />
-            </div>
-          </div>
-        </div>
-
-        <h1 className="text-white text-5xl font-bold mb-3 tracking-tight">BLOCKED</h1>
+    <div
+      className="fixed inset-0 bg-black flex items-center justify-center select-none"
+      style={{ cursor: 'default' }}
+    >
+      <div className="text-center max-w-3xl mx-auto px-12 animate-in fade-in duration-500">
+        {/* BLOCKED */}
+        <h1 className="text-white text-7xl font-black uppercase tracking-widest mb-6">
+          Blocked
+        </h1>
 
         {keyword && (
-          <p className="text-red-400/70 text-sm font-mono mb-6">
-            Detected: {keyword}
+          <p className="text-red-500 text-sm font-mono mb-8 tracking-wide">
+            {keyword}
           </p>
         )}
 
-        <p className="text-zinc-400 text-lg mb-12 max-w-md mx-auto leading-relaxed">
+        <p className="text-zinc-500 text-lg mb-16 max-w-lg mx-auto leading-relaxed">
           {message}
         </p>
 
         {/* Cooldown mode */}
         {bypassMode === 'cooldown' && (
-          <div className="space-y-6">
-            <p className="text-zinc-600 text-sm uppercase tracking-widest">
+          <div className="space-y-8">
+            <p className="text-zinc-700 text-xs uppercase tracking-[0.3em]">
               Auto-dismiss in
             </p>
-            <div className="text-red-500 text-8xl font-mono font-bold tabular-nums">
+            <div className="text-white text-8xl font-black tabular-nums">
               {remaining}
             </div>
-            {/* Progress ring */}
-            <div className="w-48 h-1 mx-auto bg-zinc-900 rounded-full overflow-hidden">
+            {/* Thin progress line */}
+            <div className="w-64 h-px mx-auto bg-zinc-900 overflow-hidden">
               <div
-                className="h-full bg-red-500/50 rounded-full transition-all duration-1000 ease-linear"
+                className="h-full bg-red-500/60 transition-all duration-1000 ease-linear"
                 style={{ width: `${(remaining / cooldown) * 100}%` }}
               />
             </div>
@@ -114,13 +110,13 @@ export default function Overlay() {
 
         {/* Soft dismiss mode */}
         {bypassMode === 'soft' && (
-          <div className="space-y-6">
+          <div className="space-y-8">
             <p className="text-zinc-600 text-sm">
               This attempt has been logged.
             </p>
             <button
               onClick={handleSoftDismiss}
-              className="px-8 py-3 bg-zinc-900 border border-zinc-800 text-zinc-500 rounded-lg hover:bg-zinc-800 hover:text-zinc-400 transition-colors text-sm"
+              className="text-xs uppercase tracking-[0.2em] text-zinc-600 hover:text-zinc-400 transition-colors"
             >
               I understand, let me continue
             </button>
@@ -129,30 +125,34 @@ export default function Overlay() {
 
         {/* Password/PIN mode */}
         {bypassMode === 'password' && (
-          <div className="space-y-4">
-            <p className="text-zinc-600 text-sm">
+          <div className="space-y-6">
+            <p className="text-zinc-700 text-xs uppercase tracking-[0.3em]">
               Enter PIN to dismiss
             </p>
-            <div className="flex gap-3 justify-center items-center">
+            <div className="flex gap-4 justify-center items-end">
               <input
                 type="password"
-                placeholder="••••••"
+                placeholder="----"
                 value={pin}
                 onChange={(e) => setPin(e.target.value)}
-                onKeyDown={(e) => { if (e.key === 'Enter') handlePinSubmit() }}
-                className={`px-6 py-3 bg-zinc-900 border ${pinError ? 'border-red-500' : 'border-zinc-800'} text-white rounded-lg text-center text-lg w-48 focus:outline-none focus:border-zinc-600 transition-colors`}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') handlePinSubmit()
+                }}
+                className={`bg-transparent border-0 border-b ${
+                  pinError ? 'border-red-500' : 'border-zinc-800'
+                } text-white text-center text-lg w-48 py-2 focus:outline-none focus:border-zinc-500 transition-colors font-mono`}
                 autoFocus
               />
               <button
                 onClick={handlePinSubmit}
-                className="px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-500 transition-colors font-medium"
+                className="text-xs uppercase tracking-[0.2em] text-red-500 hover:text-red-400 transition-colors pb-2"
               >
                 Unlock
               </button>
             </div>
             {pinError && (
-              <p className="text-red-500 text-sm animate-in fade-in">
-                Wrong PIN. Try again.
+              <p className="text-red-500 text-xs uppercase tracking-wider animate-in fade-in">
+                Wrong PIN
               </p>
             )}
           </div>
@@ -160,7 +160,7 @@ export default function Overlay() {
 
         {/* Hard block - no bypass */}
         {bypassMode === 'none' && (
-          <p className="text-zinc-700 text-sm">
+          <p className="text-zinc-700 text-xs uppercase tracking-[0.2em]">
             This content is permanently blocked. Contact your administrator.
           </p>
         )}
