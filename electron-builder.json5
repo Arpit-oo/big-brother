@@ -7,8 +7,7 @@
     "buildResources": "build"
   },
   "files": [
-    "out",
-    "dist"
+    "out/**/*"
   ],
   "extraResources": [
     {
@@ -16,10 +15,12 @@
       "to": "assets"
     }
   ],
+  "npmRebuild": false,
   "win": {
     "target": [
       "nsis"
-    ]
+    ],
+    "icon": "assets/icon.png"
   },
   "nsis": {
     "oneClick": false,
